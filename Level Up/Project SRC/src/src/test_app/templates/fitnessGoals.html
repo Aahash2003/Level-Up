@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Level Up XP</title>
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+}
+
+header {
+    text-align: center;
+}
+
+.main-header {
+    margin-top: 30px;
+    color: #007bff;
+}
+
+section {
+    margin-top: 20px;
+    text-align: center;
+}
+
+form {
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    text-align: left;
+    display: inline-block;
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin: 10px 0;
+    color: #333;
+}
+
+input,
+select {
+    width: calc(100% - 22px);
+    margin: 5px 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+select {
+    width: 100%;
+}
+
+button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.sub-header {
+    margin-top: 50px;
+    text-align: center;
+}
+
+.sub-header h2 {
+    color: #007bff;
+}
+
+    </style>
+    <script>
+        // updates the variable when the username changes
+        function updateFields() {
+                var usernameInput = document.getElementById('modify_username');
+                var usernameValue = usernameInput.value;
+
+                // Set the value to the hidden input field
+                document.getElementById('username_value').value = usernameValue;
+
+                // Request to fetch goal IDs based on the username
+                fetch(`/test/get_goal_ids/?username=${usernameValue}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Updates the dropdown with the retrieved goal IDs
+                        var goalSelect = document.getElementById('goalSelect');
+                        goalSelect.innerHTML = '';  // Clears existing options
+
+                        data.goal_ids.forEach(id => {
+                            var option = document.createElement('option');
+                            option.value = id;
+                            option.text = id;
+                            goalSelect.appendChild(option);
+                        });
+
+                        // Set the value to the hidden input field for goal_id
+                        updateGoalId();  
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+
+            // updates the goal_id immediately
+            function updateGoalId() {
+                try {
+                    var goalSelect = document.getElementById('goalSelect');
+                    var goalIdInput = document.getElementById('goal_id');
+
+                    console.log('goalSelect:', goalSelect);
+                    console.log('goalIdInput:', goalIdInput);
+
+                    // Checks if goalSelect and goalIdInput are not null or undefined before accessing their properties
+                    if (goalSelect && goalIdInput) {
+                        var goalID = goalSelect.options[goalSelect.selectedIndex].value;
+                        goalIdInput.value = goalID;
+                    } else {
+                        console.error('Error: goalSelect or goalIdInput is null or undefined.');
+                    }
+                } catch (error) {
+                    console.error('Error in updateGoalId:', error);
+                }
+            }
+
+
+                    
+
+            function modifyGoal() {
+                var username = document.getElementById('modify_username').value;
+                var goalSelect = document.getElementById('goalSelect');
+                var goalID = goalSelect.options[goalSelect.selectedIndex].value;
+                var succeeded = document.querySelector('input[name="succeeded"]:checked').value;
+
+                // Set the value of the hidden input field for goal_id
+                document.getElementById('goal_id').value = goalID;
+
+                console.log('Form Data:', {
+                    username: username,
+                    goal_id: goalID,
+                    succeeded: succeeded
+                });
+
+                var form = document.getElementById('modifyGoalForm');
+                form.action = '{% url "modify_goal" %}';
+
+                // Create a FormData object and append the values
+                var formData = new FormData(form);
+                formData.append('username', username);
+                formData.append('goal_id', goalID);
+                formData.append('succeeded', succeeded);
+
+                // Set the form data and submit
+                form.data = formData;  
+                form.submit();
+            }
+
+    </script>
+</head>
+<body>
+    <header>
+        <h1 class="main-header">Fitness Goals</h1>
+    </header>
+
+    <section>
+        <h2>Create a Fitness Goal</h2>
+        <form action="{% url 'create_goal' %}" method="post">
+            {% csrf_token %}
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="description">Description:</label>
+            <input type="text" id="description" name="description" required>
+
+            <label for="desired_weight">Desired Weight:</label>
+            <input type="number" id="desired_weight" name="desired_weight" required>
+
+            <label for="start_date">Start Date:</label>
+            <input type="date" id="start_date" name="start_date" required>
+
+            <label for="end_date">End Date:</label>
+            <input type="date" id="end_date" name="end_date" required>
+
+            <button type="submit" onClick="createGoal()">Create Goal</button>
+        </form>
+    </section>
+
+    <section>
+        <h2>View Goals</h2>
+        <form action="{% url 'view_goals' %}" method="get">
+            {% csrf_token %}
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            <button type="submit">View Goals</button>
+        </form>
+    </section>
+
+
+    <!-- Two buttons for creating and viewing goals -->
+    <div class="sub-header">
+        <h2>Fitness Goals Modify</h2> 
+    </div>
+
+    <section>
+        <h2>Modify a Fitness Goal</h2>
+        <form action="{% url 'modify_goal' %}" method="post">
+            {% csrf_token %}
+            <label for="modify_username">Username:</label>
+            <input type="text" id="modify_username" name="username" onchange="updateFields()" required>
+            <input type="hidden" id="username_value" name="username_value" value="">
+    
+            <!-- Radio buttons for succeeded -->
+            <label for="succeeded">Succeeded:</label>
+            <label for="succeeded_yes">Yes</label>
+            <input type="radio" id="succeeded_yes" name="succeeded" value="true">
+            <label for="succeeded_no">No</label>
+            <input type="radio" id="succeeded_no" name="succeeded" value="false">
+    
+            <a>Goal ID</a>
+            <select id="goalSelect" name="goalsIds">
+                {% for id in ids %}
+                    <option value="{{ id.ids }}">{{ id.ids }}</option>
+                {% endfor %}
+            </select>
+            <input type="hidden" id="goal_id" name="goal_id" value="">
+            <button type="submit" onclick="modifyGoal()">Modify Goal</button>
+        </form>
+    </section>
+
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BMI Calculator</title>
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.add-entry, .view-entries, .user-management {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+input[type="text"], input[type="number"], input[type="date"] {
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: calc(100% - 22px);
+}
+
+button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+    </style>
+    <script>
+        function updateUser() {
+       // Get the username, weight, and height from the input fields
+       var username = document.getElementById('username').value;
+       var weight = document.getElementById('weight').value;
+       var height = document.getElementById('height').value;
+
+       // Create a FormData object to handle form submission
+       var formData = new FormData();
+       formData.append('username', username);
+       formData.append('weight', weight);
+       formData.append('height', height);
+
+       // Use Fetch API to send a POST request to the update_user URL
+       fetch('{% url "update_user" %}', {
+           method: 'POST',
+           body: formData
+       })
+       .then(response => response.json())
+       .then(data => {
+           console.log(data); // Log the response for debugging
+           // Handle the response as needed (e.g., show a success message)
+       })
+       .catch(error => console.error('Error:', error));
+   }
+   </script>
+</head>
+<body>
+    <div class="wrapper">
+        <h2>Check Your BMI</h2>
+        <form id="bmiForm">
+            <div class="section1">
+                <span>Enter Your Height (in meters): </span>
+                <input type="text" id="height" name="height" autocomplete="off" placeholder="Meter">
+                <span id="errh" class="error"></span>
+            </div>
+            
+            <div class="section2">
+                <span>Enter Your Weight (in kilograms): </span>
+                <input type="text" id="weight" name="weight" autocomplete="off" placeholder="Kilogram">
+                <span id="errw" class="error"></span>
+            </div>    
+            <div class="submit">
+                <input type="submit" value="Check BMI">
+                <input type="reset" value="Clear">
+            </div>
+        </form>
+        <span id="bmiResult" class="pass"></span>
+    </div>
+
+
+    <div>
+        <h2>Check Users BMI</h2>
+        <form id="userForm" method="post" action="{% url 'calculate_bmi' %}">
+            {% csrf_token %}
+            <div class="section1">
+                <span>Enter Username </span>
+                <input type="text" name="username" placeholder="Username">
+            </div>
+            <div class="submit">
+                <button type="submit">Check BMI</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- JavaScript for BMI Calculation -->
+    <script>
+        document.getElementById('bmiForm').addEventListener('submit', function(event){
+            event.preventDefault();
+
+            var height = document.getElementById('height').value;
+            var weight = document.getElementById('weight').value;
+            var errh = document.getElementById('errh');
+            var errw = document.getElementById('errw');
+            var bmiResult = document.getElementById('bmiResult');
+
+            // Reset error messages
+            errh.innerHTML = '';
+            errw.innerHTML = '';
+            bmiResult.innerHTML = '';
+
+            // Validation
+            if(!height) {
+                errh.innerHTML = "<span style='color:#ed4337; font-size:17px; display:block'>Height is required</span>";
+                return;
+            }
+            if(!weight) {
+                errw.innerHTML = "<span style='color:#ed4337; font-size:17px; display:block'>Weight is required</span>";
+                return;
+            }
+
+            // BMI Calculation
+            var bmi = weight / (height * height);
+            bmiResult.innerHTML = "Your BMI is : " + bmi.toFixed(2);
+
+            // BMI Category
+            var bmiCategory = '';
+            if (bmi < 18.5) {
+                bmiCategory = 'Low body weight. You need to gain weight by eating moderately.';
+            } else if (bmi < 24.9) {
+                bmiCategory = 'The standard of good health.';
+            } else if (bmi < 29.9) {
+                bmiCategory = 'Excess body weight. Exercise needs to reduce excess weight.';
+            } else if (bmi < 34.9) {
+                bmiCategory = 'The first stage of obesity. It is necessary to choose food and exercise.';
+            } else if (bmi < 39.9) {
+                bmiCategory = 'The second stage of obesity. Moderate diet and exercise are required.';
+            } else {
+                bmiCategory = 'Excess fat. <b style="color:#ed4337">Fear of death</b>. Need a doctor\'s advice.';
+            }
+            bmiResult.innerHTML += "<br><span style='color:#00203FFF; display:block; margin-top:5px;'>" + bmiCategory + "</span>";
+        });
+    </script>
+</body>
+</html>

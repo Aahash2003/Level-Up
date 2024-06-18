@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Fitness Pal</title>
+    <style>
+        
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .navbar {
+            overflow: hidden;
+            background-color: #333;
+        }
+        .navbar a {
+            float: left;
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 20px;
+            text-decoration: none;
+        }
+        .navbar a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        .header {
+            text-align: center;
+            padding: 30px;
+        }
+        .about {
+            margin: 20px;
+            padding: 20px;
+            background-color: #f2f2f2;
+        }
+        #userUpdate{
+            margin-left: 300px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <a href="{% url 'create_user_profile' %}">Create User Profile</a>
+        <a href="{% url 'fitness_goals' %}">Fitness Goals</a>
+        <a href="{% url 'workout_tracker' %}">Workout Tracker</a>
+        <a href="{% url 'calorie_intake' %}">Calorie Intake</a>
+        <a href="{% url 'bmi_calculator' %}">Check/Caluculate your BMI</a>
+        <a id="userUpdate" href="{% url 'view_userUpdate' %}">Update User</a>
+        
+    </div>
+
+    <div class="header">
+        <h1>Welcome to Level Up XP</h1>
+        <p>Track your food, gym progress, and more!</p>
+    </div>
+
+    <div class="about">
+        <h2>About Level Up XP</h2>
+        <p>This application is designed to help you keep track of your fitness journey. Log your meals, set and monitor your fitness goals, and track your workout progress all in one place. Stay motivated and achieve your health and fitness objectives with ease!</p>
+    </div>
+
+
+
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <script >
+            
+            function viewWorkouts() {
+                var username = document.getElementById('username').value;
+
+                // Set the form action and include the username in the form data
+                var form = document.getElementById('workoutForm');
+                form.action = '{% url "view_workouts" %}';
+                form.innerHTML += '<input type="hidden" name="username" value="' + username + '">';
+
+                // Submit the form
+                form.submit();
+            }
+        
+            function createWorkout() {
+                document.getElementById('workoutForm').action = '{% url "create_workout" %}';
+            }
+        
+            function deleteWorkout() {
+                // Get the username and workout ID from the input fields
+                var username = document.getElementById('username').value;
+                var workoutID = document.getElementById('deleteWorkoutID').value;
+
+                // Set the form action and include the username and workout ID in the form data
+                var form = document.getElementById('workoutForm');
+                form.action = '{% url "delete_workout" %}';
+                form.innerHTML += '<input type="hidden" name="username" value="' + username + '">';
+                form.innerHTML += '<input type="hidden" name="deleteWorkoutID" value="' + workoutID + '">';
+
+                // Submit the form
+                form.submit();
+            }
+        
+            function calculateAverage() {
+                // Get the username from the input field
+                var username = document.getElementById('username').value;
+
+                // Set the form action and include the username in the form data
+                var form = document.getElementById('workoutForm');
+                form.action = '{% url "calculate_average" %}';
+                form.innerHTML += '<input type="hidden" name="username" value="' + username + '">';
+
+                // Submit the form
+                form.submit();
+            }
+        </script>
+        
+        <meta charset="UTF-8">
+        <title>Workout Tracker</title>
+    
+        <style>
+           body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+form {
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 20px;
+    text-align: left;
+    max-width: 500px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin: 10px 0;
+    color: #333;
+}
+
+input,
+select {
+    width: calc(100% - 22px);
+    margin: 5px 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+select {
+    width: 100%;
+}
+
+button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.view-workout-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.view-workout-list li {
+    margin-bottom: 10px;
+}
+
+.exercises {
+    margin-top: 20px;
+}
+
+.exercises ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.exercises li {
+    margin-bottom: 10px;
+}
+
+.avg-burned {
+    margin-top: 20px;
+}
+
+.avg-burned button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 10px 15px;
+}
+
+.avg-burned button:hover {
+    background-color: #0056b3;
+}
+
+.Delete-Workouts {
+    margin-top: 20px;
+}
+
+        </style>
+    </head>
+<body>
+    <form id="workoutForm"  method="post">
+        {% csrf_token %}
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" placeholder="Enter Username"></input>
+
+        <div class="View-Workouts">
+            <h2>View your workouts!</h2>
+            <button onclick="viewWorkouts()">View</button>
+            <div class="view-workout-list">
+                {% if workouts %}
+                    <ul>
+                        {% for workout in workouts %}
+                            <li>
+                                Workout ID: {{ workout.workout_ID }},
+                                Date: {{ workout.date }},
+        
+                                {% if workout.exercises %}
+                                    <ul>
+                                        {% for exercise in workout.exercises %}
+                                            <li>
+                                                Exercise: {{ exercise.exerciseName }},
+                                                Reps: {{ exercise.reps }},
+                                                Sets: {{ exercise.sets }}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p>No exercises found for this workout.</p>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No workouts found for the user.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <h2>Create Workout!</h2>
+        <label for="exerciseSelect">Exercise:</label>
+    <select id="exerciseSelect" name="exerciseName">
+        {% for exercise in exercises %}
+            <option value="{{ exercise.exerciseName }}">{{ exercise.exerciseName }}</option>
+        {% endfor %}
+    </select>
+
+    <div class="exercises">
+        <h2>Exercise Details:</h2>
+        <ul>
+            {% for exercise in exercises %}
+                <li>
+                    <strong>{{ exercise.exerciseName }}</strong><br>
+                    Description: {{ exercise.exerciseDescription }}<br>
+                    Duration: {{ exercise.duration }}<br>
+                    Burned Calories: {{ exercise.burnedCalories }}<br>
+                    Target Muscle: {{ exercise.targetMuscle }}<br>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <label for="workoutDate">Date:</label>
+    <input type="date" id="workoutDate" name="workoutDate"></input>
+    <label for="sets">Sets:</label>
+    <input type="text" id="sets" name="sets" placeholder="Enter Sets"></input>
+    <label for="reps">Reps:</label>
+    <input type="text" id="reps" name="reps" placeholder="Enter Reps"></input>
+
+   
+    <button type="submit" onclick="createWorkout()">Create</button>
+    </form>
+
+    <div class="avg-burned">
+        <h2>Your average calorie burned</h2>
+        <button type="submit" onclick="calculateAverage()">Calculate Average</button>
+        <p id="average-calories"></p>
+    </div>
+   
+    <div class="Delete-Workouts">
+        <h2>Delete Workout</h2>
+        <label for="deleteWorkoutID">Workout ID:</label>
+        <input type="text" id="deleteWorkoutID" name="deleteWorkoutID" placeholder="Enter Workout ID"></input>
+        <button type="submit" onclick="deleteWorkout()">Delete</button>
+    </div>
+</body>
+</html>

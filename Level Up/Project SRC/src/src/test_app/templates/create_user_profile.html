@@ -1,0 +1,101 @@
+<!-- create_user_profile.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create User Profile</title>
+    <style>
+    body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+form {
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    text-align: left;
+    display: inline-block;
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin: 10px 0;
+    color: #333;
+}
+
+input,
+select {
+    width: calc(100% - 22px);
+    margin: 5px 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+select {
+    width: 100%;
+}
+
+input[type="submit"] {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+    </style>
+</head>
+<body>
+    <h2>Create User Profile</h2>
+    <form action="{% url 'create_profile' %}" method="post">
+        {% csrf_token %}
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username" required><br>
+
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password" required><br>
+
+        <label for="name">Name:</label><br>
+        <input type="text" id="name" name="name" required><br>
+
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" required><br>
+
+        <label for="gender">Gender:</label><br>
+        <select id="gender" name="gender">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+        </select><br>
+
+        <label for="age">Age:</label><br>
+        <input type="number" id="age" name="age" required><br>
+
+        <label for="height">Height (cm):</label><br>
+        <input type="number" id="height" name="height" required><br>
+
+        <label for="weight">Weight (kg):</label><br>
+        <input type="number" id="weight" name="weight" required><br>
+
+        <input type="submit" value="Create Profile">
+    </form>
+</body>
+</html>
